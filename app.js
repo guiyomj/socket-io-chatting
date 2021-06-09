@@ -31,20 +31,25 @@ let chatList = []
 
 http.Server(app).listen(80)
 server.listen(443)
+
+// https redirect
 app.get('*', (req, res, next) => {
-    res.json('')
-    if (req.secure) next
+    if (req.secure) next()
     else {
         let to = 'https://' + req.headers.host + req.url
         return res.redirect(to)
     }
 })
 
-
+// set header
 app.all('/*', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   next();
+})
+
+app.get('*', (req, res, next) => {
+    res.send('')
 })
 
 io.on('connection', (socket) => {
@@ -56,7 +61,6 @@ io.on('connection', (socket) => {
     })
   
     socket.on('message', (data) => {
-        console.log('msg',data)
         chatList.push(data)
         io.emit('chatList', chatList)
     })
